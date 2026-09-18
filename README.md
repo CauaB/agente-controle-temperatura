@@ -2,20 +2,19 @@
 
 Projeto de um agente inteligente para controle de temperatura de um ambiente simulado.
 
-O sistema utiliza variáveis como temperatura atual, temperatura desejada, ocupação do ambiente e estado do sistema para decidir entre **ligar**, **desligar**, **manter** ou **aguardar**.
+O agente recebe informações do ambiente e, a partir de regras definidas, decide quando deve **ligar**, **desligar**, **manter** ou **aguardar** o sistema de controle.
 
-A aplicação possui uma interface web desenvolvida com Flask, HTML e CSS.
+A aplicação possui uma interface web desenvolvida com Flask, HTML, CSS e JavaScript.
 
-## Tecnologias utilizadas
+## Tecnologias
 
 - Python 3
 - Flask
 - HTML5
 - CSS3
 - JavaScript
-- Git/GitHub
 
-## Estrutura do projeto
+## Estrutura
 
 ```text
 agente-controle-temperatura/
@@ -33,24 +32,34 @@ agente-controle-temperatura/
 
 ## Requisitos
 
-Para executar o projeto, é necessário ter instalado:
+Para executar o projeto, é necessário ter:
 
-- Python 3.8 ou superior
-- pip
-- Git (caso o projeto seja baixado diretamente do GitHub)
+- Python 3 instalado
+- pip instalado
 
-Não é necessário instalar o PyCharm ou qualquer IDE específica.
+Não é necessário utilizar PyCharm ou outra IDE.
 
 ---
 
-# Como executar no Linux
+# Instalação e execução
 
-## 1. Baixar o projeto
+## Linux
 
-Clone o repositório usando o endereço disponível no botão **Code** do GitHub:
+### 1. Instalar Python e pip
+
+Em distribuições baseadas em Ubuntu/Debian, como Ubuntu e Linux Mint:
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+### 2. Baixar o projeto
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/CauaB/agente-controle-temperatura.git
 ```
 
 Entre na pasta:
@@ -59,33 +68,25 @@ Entre na pasta:
 cd agente-controle-temperatura
 ```
 
-## 2. Criar o ambiente virtual
+### 3. Instalar o Flask
 
 ```bash
-python3 -m venv .venv
+pip3 install Flask
 ```
 
-## 3. Ativar o ambiente virtual
+Caso o sistema bloqueie a instalação global de pacotes, utilize:
 
 ```bash
-source .venv/bin/activate
+pip3 install --user Flask
 ```
 
-Quando estiver ativado, normalmente aparecerá `(.venv)` no início do terminal.
-
-## 4. Instalar as dependências
+### 4. Executar
 
 ```bash
-pip install -r requirements.txt
+python3 app.py
 ```
 
-## 5. Executar a aplicação
-
-```bash
-python app.py
-```
-
-O Flask iniciará o servidor local, normalmente em:
+A aplicação ficará disponível em:
 
 ```text
 http://127.0.0.1:5000
@@ -93,69 +94,39 @@ http://127.0.0.1:5000
 
 Abra esse endereço no navegador.
 
-## 6. Encerrar a aplicação
-
-No terminal onde o Flask estiver executando, pressione:
-
-```text
-Ctrl + C
-```
-
-Para sair do ambiente virtual:
-
-```bash
-deactivate
-```
-
 ---
 
-# Como executar no Windows
+## Windows
 
-## 1. Baixar o projeto
+### 1. Instalar Python
 
-```bash
-git clone <URL_DO_REPOSITORIO>
+Instale o Python 3 e certifique-se de que o `pip` esteja disponível.
+
+### 2. Baixar o projeto
+
+```powershell
+git clone https://github.com/CauaB/agente-controle-temperatura.git
 ```
 
 Entre na pasta:
 
-```bash
+```powershell
 cd agente-controle-temperatura
 ```
 
-## 2. Criar o ambiente virtual
+### 3. Instalar o Flask
 
 ```powershell
-python -m venv .venv
+pip install Flask
 ```
 
-## 3. Ativar o ambiente virtual
-
-No PowerShell:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-No Prompt de Comando:
-
-```cmd
-.venv\Scripts\activate
-```
-
-## 4. Instalar as dependências
-
-```powershell
-pip install -r requirements.txt
-```
-
-## 5. Executar
+### 4. Executar
 
 ```powershell
 python app.py
 ```
 
-Depois, abra no navegador:
+Acesse no navegador:
 
 ```text
 http://127.0.0.1:5000
@@ -163,62 +134,92 @@ http://127.0.0.1:5000
 
 ---
 
-# Execução sem ambiente virtual
+# Usando o requirements.txt
 
-O ambiente virtual é recomendado para evitar conflitos entre projetos.
+Também é possível instalar as dependências listadas no projeto com:
 
-Caso seja necessário executar sem `.venv`, basta ter Python e Flask instalados no sistema:
+### Linux
 
 ```bash
-pip install Flask
-python app.py
+pip3 install -r requirements.txt
 ```
+
+### Windows
+
+```powershell
+pip install -r requirements.txt
+```
+
+Atualmente, o projeto utiliza o Flask como dependência externa.
 
 ---
 
-# Funcionamento
+# Funcionamento do agente
 
-O agente inicia com uma temperatura ambiente simulada e utiliza regras para determinar seu comportamento.
+O agente utiliza variáveis para representar o estado do ambiente e tomar suas decisões.
 
-Entre as variáveis utilizadas estão:
+Entre as principais variáveis estão:
 
 - **Ta**: temperatura atual do ambiente.
 - **Td**: temperatura desejada.
 - **Td_Base**: temperatura desejada base.
-- **Cam**: ocupação do ambiente, entre 0 e 1.
-- **Sigma**: parâmetro utilizado no cálculo do limiar.
-- **Alpha**: peso associado ao erro de temperatura.
-- **Beta**: peso associado ao estado do sistema.
-- **Estado do sistema**: ligado ou desligado.
-- **Limiar**: valor utilizado para determinar o acionamento do sistema.
-- **Tempo de espera**: evita decisões excessivamente frequentes.
+- **Cam**: ocupação do ambiente.
+- **Sigma**: constante utilizada no cálculo do limite de acionamento.
+- **Alpha**: peso utilizado no cálculo do custo.
+- **Beta**: peso utilizado no cálculo do custo relacionado ao estado do sistema.
+- **Estado do sistema**: indica se o sistema está ligado ou desligado.
+- **Limiar**: limite utilizado para decidir o acionamento.
+- **Tempo de espera**: controla o intervalo entre determinadas ações.
 
-A interface permite alterar a ocupação e a temperatura desejada base e executar novos ciclos do agente.
+A temperatura do ambiente é simulada pelo próprio agente:
 
-## Simulação
+- Quando o sistema está **ligado**, a temperatura diminui.
+- Quando o sistema está **desligado**, a temperatura aumenta.
 
-O projeto possui uma simulação física simplificada:
+Dessa forma, é possível testar o comportamento do agente sem sensores ou equipamentos físicos.
 
-- Quando o sistema está ligado, a temperatura simulada diminui.
-- Quando o sistema está desligado, a temperatura simulada aumenta.
+---
 
-Isso permite observar o comportamento do agente sem a necessidade de sensores ou equipamentos físicos.
+# Aplicação Web
+
+O arquivo `app.py` utiliza o Flask para disponibilizar a interface e a rota responsável pela execução dos ciclos do agente.
+
+A página principal é carregada a partir de:
+
+```text
+templates/index.html
+```
+
+Os estilos da aplicação estão em:
+
+```text
+static/style.css
+```
+
+A rota utilizada para executar um ciclo do agente é:
+
+```text
+POST /ciclo
+```
 
 ---
 
 # Testes
 
-O arquivo `testes.py` contém cenários para testar diferentes comportamentos do agente, incluindo:
+Os testes estão no arquivo:
 
-- Oscilação dentro da margem de temperatura.
-- Temperatura elevada.
-- Resfriamento gradual.
-- Mudanças bruscas de temperatura.
-- Ambiente sem ocupação.
-- Umidade elevada com presença.
+```text
+testes.py
+```
 
 Para executar:
 
 ```bash
+python3 testes.py
+```
+
+No Windows:
+
+```powershell
 python testes.py
 ```
