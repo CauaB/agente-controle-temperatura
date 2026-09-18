@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <title>Agente Controlador de Temperatura</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="dashboard-wrapper">
+
+        <!-- DASHBOARD PRINCIPAL (ESQUERDA) -->
+        <div class="main-dashboard">
+
+            <!-- CABEÇALHO E CONTROLOS -->
+            <div class="header-section">
+                <h2><span class="dot indicator-red"></span> DASHBOARD DO AGENTE TÉRMICO</h2>
+                <div class="controls-grid">
+                    <div class="input-group">
+                        <label for="cam">Ocupação (Cam 0.0 - 1.0)</label>
+                        <input type="number" id="cam" step="0.1" min="0" max="1" value="1.0">
+                    </div>
+                    <div class="input-group">
+                        <label for="td_base">Alterar Td_Base (°C)</label>
+                        <input type="number" id="td_base" step="0.1" placeholder="Padrão: 22.0">
+                    </div>
+                    <button class="btn-executar" onclick="executarCiclo()">
+                        ▶ Executar Leitura
+                    </button>
+                </div>
+            </div>
+
+            <!-- ESTADO DO AGENTE -->
+            <div class="panel-section">
+                <h3 class="section-title">MONITORIZAÇÃO EM TEMPO REAL</h3>
+
+                <div class="status-badges">
+                    <div class="badge badge-system" id="badge_estado">
+                        <span class="dot"></span> AGUARDANDO
+                    </div>
+                    <div class="badge badge-action" id="badge_acao">
+                        --
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card border-red">
+                        <span class="m-title">T. ATUAL</span>
+                        <div class="m-value"><span id="val_ta">--</span> <span class="m-unit">°C</span></div>
+                    </div>
+                    <div class="metric-card border-blue">
+                        <span class="m-title">TD DESEJADA</span>
+                        <div class="m-value"><span id="val_td">--</span> <span class="m-unit">°C</span></div>
+                    </div>
+                    <div class="metric-card border-orange">
+                        <span class="m-title">LIMIAR L</span>
+                        <div class="m-value"><span id="val_limiar">--</span> <span class="m-unit">°C</span></div>
+                    </div>
+                    <div class="metric-card border-green">
+                        <span class="m-title">CUSTO J</span>
+                        <div class="m-value"><span id="val_custo">--</span></div>
+                    </div>
+                    <div class="metric-card border-purple">
+                        <span class="m-title">ESPERA ATIVA</span>
+                        <div class="m-value"><span id="val_espera">0</span> <span class="m-unit">leit.</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTÓRICO E MEMÓRIA -->
+            <div class="panel-section section-memory">
+                <h3 class="section-title">MEMÓRIA RECENTE</h3>
+
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th># Ciclo</th>
+                            <th>Ta (°C)</th>
+                            <th>Td (°C)</th>
+                            <th>Limiar L</th>
+                            <th>SISTEMA</th>
+                            <th>AÇÃO</th>
+                            <th>Custo J</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista_memoria">
+                        <!-- Preenchido pelo JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div> <!-- Fim Main Dashboard -->
+
+        <!-- PAINEL LATERAL (DIREITA) - REGRAS APLICADAS -->
+        <div class="sidebar-regras">
+            <div class="panel-section">
+                <h3 class="section-title">REGRAS APLICADAS</h3>
+                <div class="rules-list" id="lista_regras">
+                    <!-- As regras vão aparecer aqui de forma dinâmica -->
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- Fim Dashboard Wrapper -->
+
+    <script>
+        window.onload = function() {
+            executarCiclo(true);
+        };
+
+        let totalCiclos = 0;
+
+        function executarCiclo(inicial = false) {
+            const cam = document.getElementById('cam').value;
+            let td_base = document.getElementById('td_base').value;
+
+            if (inicial) td_base = "";
+
+            fetch('/ciclo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cam: cam, td_base: td_base })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const r = data.status;
+                if (!inicial) totalCiclos++;
+
+                // 1. Atualizar as métricas numéricas
+                document.getElementById('val_ta').innerText = r.Ta.toFixed(2);
+                document.getElementById('val_td').innerText = r.Td.toFixed(1);
+                document.getElementById('val_limiar').innerText = r.Limiar.toFixed(2);
+                document.getElementById('val_custo').innerText = r.Custo.toFixed(3);
+                document.getElementById('val_espera').innerText = data.tempo_espera;
+
+                // 2. Atualizar o Badge de Estado
+                const badgeEstado = document.getElementById('badge_estado');
+                if (r.Estado_Sistema === 'LIGADO') {
+                    badgeEstado.className = 'badge badge-system active-red';
+                    badgeEstado.innerHTML = '<span class="dot solid-red"></span> LIGADO ❄️';
+                } else {
+                    badgeEstado.className = 'badge badge-system';
+                    badgeEstado.style.backgroundColor = '#e8f5e9';
+                    badgeEstado.style.color = '#2e7d32';
+                    badgeEstado.style.borderColor = '#c8e6c9';
+                    badgeEstado.innerHTML = '<span class="dot" style="background-color: #2e7d32;"></span> DESLIGADO';
+                }
+
+                // 3. Atualizar o Badge de Ação
+                const badgeAcao = document.getElementById('badge_acao');
+                badgeAcao.innerText = r.Acao.toUpperCase();
+                if (data.tempo_espera > 0) {
+                    badgeAcao.style.backgroundColor = '#fff3e0';
+                    badgeAcao.style.borderColor = '#ffe0b2';
+                    badgeAcao.style.color = '#e65100';
+                } else {
+                    badgeAcao.style.backgroundColor = '#e3f2fd';
+                    badgeAcao.style.borderColor = '#90caf9';
+                    badgeAcao.style.color = '#1976d2';
+                }
+
+                // 4. Adicionar Regra Aplicada ao Painel Lateral (Apenas se não for o carregamento inicial)
+                if (!inicial) {
+                    const listaRegras = document.getElementById('lista_regras');
+                    const regraDiv = document.createElement('div');
+                    regraDiv.className = 'rule-alert';
+
+                    let textoRegra = '';
+                    if (data.tempo_espera > 0) {
+                        textoRegra = `Em espera — ignorando a leitura atual. Restam ${data.tempo_espera} ciclo(s) a aguardar.`;
+                    } else {
+                        textoRegra = `Avaliação de Limiar (${r.Limiar.toFixed(2)}°C). Ação decidida: <strong>${r.Acao.toUpperCase()}</strong>.`;
+                    }
+
+                    regraDiv.innerHTML = `
+                        <div class="rule-tag">#${totalCiclos}</div>
+                        <div class="rule-text">${textoRegra}</div>
+                    `;
+                    // Insere no topo da lista
+                    listaRegras.insertBefore(regraDiv, listaRegras.firstChild);
+                }
+
+                // 5. Atualizar a Tabela de Memória
+                const memoriaHtml = data.memoria.map((item, index) => {
+                    const idCiclo = totalCiclos - (data.memoria.length - 1 - index);
+                    const numCiclo = idCiclo > 0 ? idCiclo : '-';
+
+                    return `
+                    <tr>
+                        <td>#${numCiclo}</td>
+                        <td>${item.Ta.toFixed(2)}</td>
+                        <td>${item.Td.toFixed(2)}</td>
+                        <td>${item.Limiar.toFixed(2)}</td>
+                        <td class="${item.Estado_Sistema === 'LIGADO' ? 'text-red font-bold' : 'text-green'}">
+                            ${item.Estado_Sistema === 'LIGADO' ? '❄ LIGADO' : '○ DESL.'}
+                        </td>
+                        <td class="${item.Acao === 'Ligar' || item.Acao === 'LIGAR' ? 'text-red font-bold' : (item.Acao === 'Desligar' || item.Acao === 'DESLIGAR' ? 'text-green font-bold' : '')}">
+                            ${item.Acao.toUpperCase()}
+                        </td>
+                        <td>${item.Custo.toFixed(3)}</td>
+                    </tr>
+                `}).reverse().join('');
+
+                document.getElementById('lista_memoria').innerHTML = memoriaHtml;
+                document.getElementById('td_base').value = ""; // Limpa o input
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+</body>
+</html>

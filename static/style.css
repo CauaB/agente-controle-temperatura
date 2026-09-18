@@ -1,0 +1,278 @@
+/* Definições globais */
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+body {
+    background-color: #f4f6f8;
+    margin: 40px 20px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Novo Contentor Flexível para dividir Esquerda e Direita */
+.dashboard-wrapper {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px; /* Aumentado para acomodar o painel direito */
+    align-items: flex-start;
+}
+
+/* Container Principal do Dashboard (Esquerda) */
+.main-dashboard {
+    flex: 1; /* Ocupa o espaço restante */
+    background: #ffffff;
+    border: 1px solid #e0e4e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+/* Painel Lateral de Regras (Direita) */
+.sidebar-regras {
+    width: 320px; /* Largura fixa */
+    background: #ffffff;
+    border: 1px solid #e0e4e8;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    max-height: 800px;
+}
+.rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 700px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Estilos das Regras */
+.rule-alert {
+    display: flex;
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    gap: 10px;
+    align-items: flex-start;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.rule-tag {
+    background: #e9ecef;
+    color: #6c757d;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 6px;
+    border-radius: 4px;
+}
+.rule-text {
+    font-size: 13px;
+    color: #495057;
+    line-height: 1.4;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cabeçalho e Controlos */
+.header-section {
+    background-color: #fafbfc;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e0e4e8;
+}
+.header-section h2 {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: #3e4c59;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.controls-grid {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+.input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+.input-group label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7b8a9b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+.input-group input {
+    padding: 10px 12px;
+    border: 1px solid #cbd2d9;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.2s;
+}
+.input-group input:focus {
+    border-color: #1976d2;
+}
+.btn-executar {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 11px 24px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    height: 40px;
+}
+.btn-executar:hover {
+    background-color: #1565c0;
+}
+
+/* Secções Internas */
+.panel-section {
+    padding: 25px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.panel-section:last-child {
+    border-bottom: none;
+}
+
+/* Títulos das Secções */
+.section-title {
+    font-size: 11px;
+    color: #7b8a9b;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Utilitários Visuais */
+.dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.indicator-red { background-color: #d32f2f; }
+.solid-red { background-color: #d32f2f; width: 6px; height: 6px; }
+
+/* Badges de Estado */
+.status-badges {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+.badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.badge-system.active-red {
+    background-color: #fdeaea;
+    color: #d32f2f;
+    border: 1px solid #f8b4b4;
+}
+.badge-action {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #90caf9;
+}
+
+/* Grid de Métricas */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 15px;
+}
+.metric-card {
+    background: #ffffff;
+    border: 1px solid #eaeef2;
+    border-radius: 6px;
+    padding: 15px 12px;
+    border-top-width: 3px;
+    border-top-style: solid;
+}
+.border-red { border-top-color: #d32f2f; }
+.border-blue { border-top-color: #1976d2; }
+.border-orange { border-top-color: #f57c00; }
+.border-green { border-top-color: #388e3c; }
+.border-purple { border-top-color: #7b1fa2; }
+
+.m-title {
+    display: block;
+    font-size: 10px;
+    color: #9aa5b1;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+.m-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2933;
+}
+.m-unit {
+    font-size: 13px;
+    color: #9aa5b1;
+    font-weight: normal;
+}
+
+/* Área de Memória / Tabela */
+.section-memory {
+    background-color: #fdfdfd;
+}
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.history-table th {
+    background-color: #f1f3f5;
+    color: #7b8a9b;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 4px;
+}
+.history-table td {
+    padding: 12px 12px;
+    border-bottom: 1px solid #f1f3f5;
+    color: #3e4c59;
+    font-family: monospace;
+}
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Scrollbar fina para a lista de regras */
+.rules-list::-webkit-scrollbar {
+    width: 6px;
+}
+.rules-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.rules-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+.rules-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Utilitários de Cor para a Tabela */
+.text-green { color: #2e7d32; }
+.text-red { color: #c62828; }
+.font-bold { font-weight: 700; }
